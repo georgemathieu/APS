@@ -2,6 +2,8 @@ package APS0;
 
 import java.util.ArrayList;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstType implements Ast{
 	
 	ArrayList<String> nom;
@@ -37,4 +39,8 @@ public class AstType implements Ast{
 		return nom;
 	}
 	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
+	}
 }

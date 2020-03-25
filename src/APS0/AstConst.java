@@ -1,5 +1,7 @@
 package APS0;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstConst implements AstDec{
 	
 	AstId nom;
@@ -22,6 +24,11 @@ public class AstConst implements AstDec{
 			t = type.toPrologStringF();
 		}
 		return "const("+nom.toPrologString()+","+t+","+valeur.toPrologString()+")";
+	}
+	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
 	}
 
 }

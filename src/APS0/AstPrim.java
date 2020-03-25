@@ -3,6 +3,8 @@ package APS0;
 
 import java.util.ArrayList;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstPrim implements Ast {
 
 	Op op;
@@ -22,5 +24,9 @@ public class AstPrim implements Ast {
 		r += ")";
 		return r;
 	}
-
+	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
+	}
 }

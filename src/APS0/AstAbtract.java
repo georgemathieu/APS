@@ -2,6 +2,8 @@ package APS0;
 
 import java.util.ArrayList;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstAbtract implements Ast{
 	
 	private ArrayList<AstArg> args;
@@ -25,5 +27,8 @@ public class AstAbtract implements Ast{
 		return sb.toString();
 	}
 	
-
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
+	}
 }

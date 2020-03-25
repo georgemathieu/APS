@@ -1,5 +1,6 @@
 package APS0;
 
+import APS0.interfaces.IASTvisitor;
 
 public class AstId implements Ast{
 	
@@ -13,5 +14,13 @@ public class AstId implements Ast{
 	public String toPrologString() {
 		return "var(" + name + ")";
 	}
+	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
+	}
 
+	public String getName() {
+		return name;
+	}
 }

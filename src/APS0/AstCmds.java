@@ -1,5 +1,7 @@
 package APS0;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstCmds implements Ast {
 
 	private AstEcho statement;
@@ -28,6 +30,11 @@ public class AstCmds implements Ast {
 			return "commands(" + statement.toPrologString() + "," + commands.toPrologString() + ")";
 		}
 		return "commands(" + statement.toPrologString() + ")";
+	}
+	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
 	}
 
 }

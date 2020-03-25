@@ -1,5 +1,7 @@
 package APS0;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstArg implements Ast{
 	
 	AstId nom;
@@ -17,4 +19,8 @@ public class AstArg implements Ast{
 		return "("+nom.toPrologString()+","+type.toPrologString()+")";
 	}
 	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
+	}
 }

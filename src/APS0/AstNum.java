@@ -1,5 +1,6 @@
 package APS0;
 
+import APS0.interfaces.IASTvisitor;
 
 public class AstNum implements Ast{
 	
@@ -13,5 +14,9 @@ public class AstNum implements Ast{
 	public String toPrologString() {
 		return "num(" + val + ")";
 	}
-
+	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
+	}
 }

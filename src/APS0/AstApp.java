@@ -2,6 +2,8 @@ package APS0;
 
 import java.util.ArrayList;
 
+import APS0.interfaces.IASTvisitor;
+
 public class AstApp implements Ast{
 	
 	Ast nom;
@@ -23,5 +25,10 @@ public class AstApp implements Ast{
 		sb.append(param.get(0).toPrologString());
 		sb.append("])");
 		return sb.toString();
+	}
+	
+	public <Result, Data, Anomaly extends Throwable> Result accept(
+			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
+		 return visitor.visit(this, data);
 	}
 }
