@@ -11,7 +11,6 @@
 	}
 %}
 
-cbool = TRUE | FALSE
 nums = -?[0-9]+
 ident = [a-z][a-zA-Z0-9]*
 nls  = \n | \r | \r\n
@@ -68,10 +67,10 @@ nls  = \n | \r | \r\n
 "int" {return Parser.INT; }
 
 /* const */
-"const" {return Parser.CONST; }
+"CONST" {return Parser.CONST; }
 
 /* rec */
-"rec" {return Parser.REC; }
+"REC" {return Parser.REC; }
 
 /* not */
 "not" {return Parser.NOT; }
@@ -91,9 +90,10 @@ nls  = \n | \r | \r\n
 /* if */
 "if" {return Parser.IF; }
 
-/* float */
+
 {nums}  { yyparser.yylval = new ParserVal(Integer.parseInt(yytext()));return Parser.NUM; }
 {ident} { yyparser.yylval = new ParserVal(yytext());return Parser.IDENT;}
+
 
 /* whitespace */
 [ \t]+ { }

@@ -15,11 +15,12 @@ public class AstAbtract implements Ast{
 
 	@Override
 	public String toPrologString() {
-		StringBuilder sb = new StringBuilder("Abstract(");
+		StringBuilder sb = new StringBuilder("abstract(" + "args([");
 		for (int i = args.size() - 1; i > 0; i--) {
 			sb.append(args.get(i).toPrologString()+",");
 		}
 		sb.append(args.get(0).toPrologString());
+		sb.append("])");
 		sb.append("," + expression.toPrologString() + ")");
 		return sb.toString();
 	}

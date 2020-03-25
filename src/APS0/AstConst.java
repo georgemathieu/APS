@@ -14,7 +14,14 @@ public class AstConst implements AstDec{
 
 	@Override
 	public String toPrologString() {
-		return "Const("+nom.toPrologString()+","+type.toPrologString()+","+valeur.toPrologString()+")";
+		String t;
+		if(type.getNom().size() == 1) {
+			t = type.toPrologString();
+		} else
+		{
+			t = type.toPrologStringF();
+		}
+		return "const("+nom.toPrologString()+","+t+","+valeur.toPrologString()+")";
 	}
 
 }

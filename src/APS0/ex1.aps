@@ -1,1 +1,1 @@
-[ ECHO (add 41 1 ) ]
+[FUN f (int -> int) [x:int][y:int](add x y);ECHO ((f 21) 21)]

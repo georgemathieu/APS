@@ -6,7 +6,6 @@
 %token NL                    /* newline  */
 %token <ival> NUM 	         /* a number */
 %token <sval> IDENT          /* an identifier */
-%token <sval> CBOOL			 /* boolean */
 %token PLUS MINUS TIMES DIV  /* operators */
 %token LPAR RPAR             /* parenthesis */
 %token LCRO RCRO             /* crochets */
@@ -46,7 +45,7 @@
 
 %%
 
-progs : LCRO cmds RCRO { $$=$2; }
+progs : LCRO cmds RCRO { $$= new AstProgram((AstCmds)$2); }
 ;
 
 cmds:  stat   			 {  $$ = new AstCmds((AstEcho)$1); }
@@ -58,17 +57,23 @@ stat :
 ECHO  expr 	  { $$ = new AstEcho((Ast)$2); }
 ;
 
-expr:NUM                 { $$ = new AstNum($1); }
-| IDENT                  { $$ = new AstId($1); }
-| CBOOL					 { $$ = new AstBool($1); }
+expr:NUM                 	{ $$ = new AstNum($1); }
+| TRUE						{ $$ = new AstBool("true"); }
+| FALSE						{ $$ = new AstBool("false"); }
+| IDENT                  	{ $$ = new AstId($1); }
 | LPAR IF  expr expr expr RPAR { $$ = new AstIF ((Ast)$3,(Ast)$4,(Ast)$5); }
-| LPAR PLUS exprs RPAR   { $$ = new AstPrim(Op.ADD,(ArrayList<Ast>)$3); }
-| LPAR MINUS exprs RPAR  { $$ = new AstPrim(Op.SUB,(ArrayList<Ast>)$3); }
-| LPAR TIMES exprs RPAR  { $$ = new AstPrim(Op.MUL,(ArrayList<Ast>)$3); }
-| LPAR DIV exprs RPAR    { $$ = new AstPrim(Op.DIV,(ArrayList<Ast>)$3); }
-| LPAR expr RPAR 		 { $$ = (Ast)$2 ;}
-| LCRO args RCRO expr  	 { $$ = new AstAbtract((ArrayList<AstArg>)$2,(Ast)$4);}
-| LPAR expr exprs RPAR	 { ((ArrayList<Ast>)$3).add((Ast)$2); $$ = $3; }
+| LPAR PLUS exprs RPAR   	{ $$ = new AstPrim(Op.ADD,(ArrayList<Ast>)$3); }
+| LPAR MINUS exprs RPAR  	{ $$ = new AstPrim(Op.SUB,(ArrayList<Ast>)$3); }
+| LPAR TIMES exprs RPAR  	{ $$ = new AstPrim(Op.MUL,(ArrayList<Ast>)$3); }
+| LPAR DIV exprs RPAR    	{ $$ = new AstPrim(Op.DIV,(ArrayList<Ast>)$3); }
+| LPAR NOT exprs RPAR 		{ $$ = new AstPrim(Op.NOT,(ArrayList<Ast>)$3); }
+| LPAR OR exprs RPAR 		{ $$ = new AstPrim(Op.OR,(ArrayList<Ast>)$3); }
+| LPAR AND exprs RPAR 		{ $$ = new AstPrim(Op.AND,(ArrayList<Ast>)$3); }
+| LPAR LT exprs RPAR 		{ $$ = new AstPrim(Op.LT,(ArrayList<Ast>)$3); }
+| LPAR EQ exprs RPAR 		{ $$ = new AstPrim(Op.EQ,(ArrayList<Ast>)$3); }
+| LPAR expr RPAR 		 	{ $$ = (Ast)$2 ;}
+| LCRO args RCRO expr  	 	{ $$ = new AstAbtract((ArrayList<AstArg>)$2,(Ast)$4);}
+| LPAR expr exprs RPAR      { $$ = new AstApp((Ast)$2,(ArrayList<Ast>)$3); }
 ;
 
 exprs:
@@ -86,13 +91,19 @@ CONST IDENT type expr { $$ = new AstConst(new AstId($2),(AstType)$3,(Ast)$4);}
 
 
 type : 
-BOOL  { $$ = new AstType(new AstId("Bool"));}
-|INT   { $$ = new AstType(new AstId("Int"));}
-|LPAR types FLECHE type RPAR { ((ArrayList<AstId>)$2).add(new AstId($4)); $$ = $2; }
+BOOL   { ArrayList<String> ar = new ArrayList<String>(); ar.add("bool");
+		$$ = new AstType(ar);}
+|INT   { ArrayList<String> ar = new ArrayList<String>(); ar.add("int");
+		$$ = new AstType(ar);}
+|LPAR types FLECHE type RPAR { ((ArrayList<AstType>)$2).add((AstType)$4);
+								ArrayList<String> ar = new ArrayList<String>();
+								for(AstType at : (ArrayList<AstType>)$2){ar.addAll(at.getNom());}
+								AstType s = new AstType(ar); $$ = s;}
 ;
 
-types : type 	{ ArrayList<AstType> r = new ArrayList<AstType>();
-					r.add((AstType)$1); $$ = r;}
+types : 
+type 	{ ArrayList<AstType> r = new ArrayList<AstType>();
+						r.add((AstType)$1); $$ = r; }
 |type ETOILE types {((ArrayList<AstType>)$3).add((AstType)$1); $$ = $3;}
 ;
 

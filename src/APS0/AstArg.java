@@ -14,9 +14,7 @@ public class AstArg implements Ast{
 
 	@Override
 	public String toPrologString() {
-		return "Arg("+nom.toPrologString()+","+type.toPrologString()+")";
+		return "("+nom.toPrologString()+","+type.toPrologString()+")";
 	}
 	
-	
-
 }

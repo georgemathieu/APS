@@ -15,11 +15,11 @@ public class AstPrim implements Ast {
 
 	public String toPrologString() {
 		String r = "";
-		r = op.toString() + "([";
+		r = op.toString() + "(";
 		for (int i = opands.size() - 1; i > 0 ; i--)
 			r += opands.get(i).toPrologString() + ",";
 		r += opands.get(0).toPrologString();
-		r += "])";
+		r += ")";
 		return r;
 	}
 

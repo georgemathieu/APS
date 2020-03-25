@@ -23,11 +23,11 @@ public class AstCmds implements Ast {
 	@Override
 	public String toPrologString() {
 		if (declaration != null) {
-			return "Commands(" + declaration.toPrologString() + "," + commands.toPrologString() + ")";
+			return "commands(declaration(" + declaration.toPrologString() + ")," + commands.toPrologString() + ")";
 		} else if (commands != null) {
-			return "Commands(" + statement.toPrologString() + "," + commands.toPrologString() + ")";
+			return "commands(" + statement.toPrologString() + "," + commands.toPrologString() + ")";
 		}
-		return "Commands(" + statement.toPrologString() + ")";
+		return "commands(" + statement.toPrologString() + ")";
 	}
 
 }
