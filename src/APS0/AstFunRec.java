@@ -40,4 +40,38 @@ public class AstFunRec implements AstDec{
 			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
 		 return visitor.visit(this, data);
 	}
+
+	public AstId getNom() {
+		return nom;
+	}
+
+	public void setNom(AstId nom) {
+		this.nom = nom;
+	}
+
+	public AstType getType() {
+		return type;
+	}
+
+	public void setType(AstType type) {
+		this.type = type;
+	}
+
+	public ArrayList<AstArg> getArgs() {
+		return args;
+	}
+
+	public void setArgs(ArrayList<AstArg> args) {
+		this.args = args;
+	}
+
+	public Ast getBody() {
+		return body;
+	}
+
+	public void setBody(Ast body) {
+		this.body = body;
+	}
+	
+	
 }

@@ -31,4 +31,30 @@ public class AstConst implements AstDec{
 		 return visitor.visit(this, data);
 	}
 
+	public AstId getNom() {
+		return nom;
+	}
+
+	public void setNom(AstId nom) {
+		this.nom = nom;
+	}
+
+	public AstType getType() {
+		return type;
+	}
+
+	public void setType(AstType type) {
+		this.type = type;
+	}
+
+	public Ast getValeur() {
+		return valeur;
+	}
+
+	public void setValeur(Ast valeur) {
+		this.valeur = valeur;
+	}
+	
+	
+
 }

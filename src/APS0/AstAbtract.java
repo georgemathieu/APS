@@ -31,4 +31,22 @@ public class AstAbtract implements Ast{
 			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
 		 return visitor.visit(this, data);
 	}
+
+	public ArrayList<AstArg> getArgs() {
+		return args;
+	}
+
+	public void setArgs(ArrayList<AstArg> args) {
+		this.args = args;
+	}
+
+	public Ast getExpression() {
+		return expression;
+	}
+
+	public void setExpression(Ast expression) {
+		this.expression = expression;
+	}
+	
+	
 }

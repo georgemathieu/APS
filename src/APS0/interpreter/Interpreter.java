@@ -243,14 +243,12 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 
 	@Override
 	public Object visit(AstId iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+		return globalVariableEnvironment.getGlobalVariableValue(iast.getName());
 	}
 
 	@Override
 	public Object visit(AstNum iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+		//return iast.get
 	}
 
 	@Override

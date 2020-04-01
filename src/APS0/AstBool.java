@@ -26,4 +26,6 @@ public class AstBool implements Ast {
 	public String getValue(){
 		return b;
 	}
+	
+	
 }

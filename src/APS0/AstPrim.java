@@ -29,4 +29,14 @@ public class AstPrim implements Ast {
 			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
 		 return visitor.visit(this, data);
 	}
+
+	public Op getOp() {
+		return op;
+	}
+
+	public ArrayList<Ast> getOpands() {
+		return opands;
+	}
+	
+	
 }

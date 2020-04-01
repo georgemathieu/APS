@@ -37,4 +37,30 @@ public class AstCmds implements Ast {
 		 return visitor.visit(this, data);
 	}
 
+	public AstEcho getStatement() {
+		return statement;
+	}
+
+	public void setStatement(AstEcho statement) {
+		this.statement = statement;
+	}
+
+	public AstDec getDeclaration() {
+		return declaration;
+	}
+
+	public void setDeclaration(AstDec declaration) {
+		this.declaration = declaration;
+	}
+
+	public AstCmds getCommands() {
+		return commands;
+	}
+
+	public void setCommands(AstCmds commands) {
+		this.commands = commands;
+	}
+	
+	
+
 }

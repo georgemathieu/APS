@@ -35,7 +35,6 @@ public class AstType implements Ast{
 	}
 
 	public ArrayList<String> getNom() {
-		// TODO Auto-generated method stub
 		return nom;
 	}
 	

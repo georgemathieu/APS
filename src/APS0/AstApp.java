@@ -31,4 +31,26 @@ public class AstApp implements Ast{
 			IASTvisitor<Result, Data, Anomaly> visitor, Data data) throws Anomaly {
 		 return visitor.visit(this, data);
 	}
+
+
+	public Ast getNom() {
+		return nom;
+	}
+
+
+	public void setNom(Ast nom) {
+		this.nom = nom;
+	}
+
+
+	public ArrayList<Ast> getParam() {
+		return param;
+	}
+
+
+	public void setParam(ArrayList<Ast> param) {
+		this.param = param;
+	}
+	
+	
 }
