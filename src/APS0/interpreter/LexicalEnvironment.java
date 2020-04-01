@@ -46,6 +46,7 @@ public class LexicalEnvironment implements ILexicalEnvironment {
 
     @Override
 	public ILexicalEnvironment extend(AstId variable, Object value) {
+    	System.out.println("10");
         return new LexicalEnvironment(variable, value, this);
     }
     

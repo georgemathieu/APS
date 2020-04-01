@@ -6,6 +6,9 @@
  ***************************************************************** */
 package APS0.interpreter;
 
+import java.util.ArrayList;
+
+import APS0.Ast;
 import APS0.AstAbtract;
 import APS0.AstApp;
 import APS0.AstArg;
@@ -64,17 +67,24 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
     //private static Object whatever = "whatever";
             
     @Override
-	public Object visit(AstIF iast, ILexicalEnvironment lexenv) throws EvaluationException {
-    	Object c = iast.getCondition().accept(this, lexenv);
-        if ( c != null && c instanceof Boolean ) {
-            Boolean b = (Boolean) c;
-            if ( b.booleanValue() ) {
-                return iast.getConsequence().accept(this, lexenv);
-            } else /*if ( iast.isTernary() )*/ {
-                return iast.getAlternant().accept(this, lexenv);          
+	public Object visit(AstIF ast, ILexicalEnvironment lexenv) throws EvaluationException {
+    	Object c = ast.getCondition().accept(this, lexenv);
+        if ( c != null && c instanceof Integer ) {
+            int x = (Integer) c;
+            if (x == 1) {
+                return ast.getConsequence().accept(this, lexenv);
+            } else if (x == 0){
+                return ast.getAlternant().accept(this, lexenv);          
             }
-        } else {
-            return iast.getConsequence().accept(this, lexenv);
+            else {
+            	String msg = "condition not a boolean value";
+    			throw new EvaluationException(msg);
+            }
+        }
+        else
+        {
+        	String msg = "condition not a boolean value";
+			throw new EvaluationException(msg);
         }
 	}
 
@@ -176,63 +186,92 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	*/
     
 	@Override
-	public Object visit(AstAbtract iast, ILexicalEnvironment data) throws EvaluationException {
+	public Object visit(AstAbtract ast, ILexicalEnvironment data) throws EvaluationException {
+		ast.getArgs();
+		return null;
+	}
+
+	@Override
+	public Object visit(AstApp ast, ILexicalEnvironment data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object visit(AstApp iast, ILexicalEnvironment data) throws EvaluationException {
+	public Object visit(AstArg ast, ILexicalEnvironment data) throws EvaluationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object visit(AstArg iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(AstBool iast, ILexicalEnvironment data) throws EvaluationException {
-		String value = iast.getValue();
+	public Object visit(AstBool ast, ILexicalEnvironment data) throws EvaluationException {
+		String value = ast.getValue();
 		if (value == "true") {
-			return true;
+			return 1;
 		} else if (value == "false") {
-			return false;
+			return 0;
 		} else {
-			String msg = "no boolean value";
+			String msg = "not a boolean value";
 			throw new EvaluationException(msg);
 		}
 	}
 
 	@Override
-	public Object visit(AstCmds iast, ILexicalEnvironment data) throws EvaluationException {
+	public Object visit(AstCmds ast, ILexicalEnvironment data) throws EvaluationException {
+		
+		 AstEcho statement = ast.getStatement();
+		 AstDec declaration = ast.getDeclaration();
+		 AstCmds commands = ast.getCommands();
+		 
+		if (statement != null ) {
+			statement.accept(this, data);
+			commands.accept(this, data);
+		}
+		else if (declaration != null){
+			ILexicalEnvironment newData =  (ILexicalEnvironment) declaration.accept(this, data);
+			commands.accept(this, newData);
+		} else if(commands != null){
+			commands.accept(this, data);
+		}
+		//(END)
 		return true;
 	}
 
 	@Override
-	public Object visit(AstConst iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object visit(AstConst ast, ILexicalEnvironment data) throws EvaluationException {
+		return data.extend(ast.getNom(),ast.getValeur().accept(this, data));
 	}
 
 	@Override
 	public Object visit(AstDec iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
+		//jamais utiliser car ya AstConst, AstFun et AstFunRec
 		return null;
 	}
 
 	@Override
-	public Object visit(AstEcho iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object visit(AstEcho ast, ILexicalEnvironment data) throws EvaluationException {
+		Object n = ast.getAst().accept(this, data);
+		if(n != null && n instanceof Integer)
+		{
+			System.out.println(n);
+		}
+		else
+		{
+			String msg = "not an Integer value";
+			throw new EvaluationException(msg);
+		}
+		return n;
 	}
 
 	@Override
-	public Object visit(AstFun iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object visit(AstFun ast, ILexicalEnvironment data) throws EvaluationException {
+		AstId nom = ast.getNom();
+		//AstType type = ast.getType();
+		ArrayList<AstArg> args = ast.getArgs();
+		Ast body = ast.getBody();
+		
+		//creer une Fermeture avec args et body et remplacer le 0 par la Fermeture
+		return data.extend(nom,0);
 	}
 
 	@Override
@@ -242,26 +281,23 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	}
 
 	@Override
-	public Object visit(AstId iast, ILexicalEnvironment data) throws EvaluationException {
-		return globalVariableEnvironment.getGlobalVariableValue(iast.getName());
+	public Object visit(AstId ast, ILexicalEnvironment data) throws EvaluationException {
+		return data.getValue(ast);
 	}
 
 	@Override
-	public Object visit(AstNum iast, ILexicalEnvironment data) throws EvaluationException {
-		//return iast.get
+	public Object visit(AstNum ast, ILexicalEnvironment data) throws EvaluationException {
+		return ast.getValue();
 	}
 
 	@Override
-	public Object visit(AstPrim iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Object visit(AstPrim ast, ILexicalEnvironment data) throws EvaluationException {
 		return null;
 	}
 
-	
-
 	@Override
-	public Object visit(AstType iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
+	public Object visit(AstType ast, ILexicalEnvironment data) throws EvaluationException {
+		// a priori on visite jamais les types.
 		return null;
 	}
     
