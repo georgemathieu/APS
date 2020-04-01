@@ -7,7 +7,9 @@
 package APS0.interpreter;
 
 import java.util.ArrayList;
-
+import java.util.List;
+import java.util.Vector;
+import APS0.interpreter.EmptyLexicalEnvironment;
 import APS0.Ast;
 import APS0.AstAbtract;
 import APS0.AstApp;
@@ -25,13 +27,16 @@ import APS0.AstNum;
 import APS0.AstPrim;
 import APS0.AstProgram;
 import APS0.AstType;
+import APS0.Op;
 import APS0.interfaces.IASTvisitor;
 import APS0.interpreter.interfaces.EvaluationException;
+import APS0.interpreter.interfaces.IFunction;
 import APS0.interpreter.interfaces.IGlobalVariableEnvironment;
 import APS0.interpreter.interfaces.ILexicalEnvironment;
 //import com.paracamplus.ilp1.interpreter.interfaces.IOperator;
 //import com.paracamplus.ilp1.interpreter.interfaces.IOperatorEnvironment;
 //import com.paracamplus.ilp1.interpreter.interfaces.Invocable;
+import APS0.interpreter.interfaces.Invocable;
 
 public class Interpreter
 implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
@@ -193,8 +198,19 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 
 	@Override
 	public Object visit(AstApp ast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+		Object function = ast.getNom().accept(this, data);
+	        if ( function instanceof Invocable ) {
+	            Invocable f = (Invocable)function;
+	            List<Object> args = new Vector<Object>();
+	            for ( Ast arg : ast.getParam() ) {
+	                Object value = arg.accept(this, data);
+	                args.add(value);
+	            }
+	            return f.apply(this, args.toArray());
+	        } else {
+	            String msg = "Cannot apply " + function;
+	            throw new EvaluationException(msg);
+	        }
 	}
 
 	@Override
@@ -266,12 +282,11 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	@Override
 	public Object visit(AstFun ast, ILexicalEnvironment data) throws EvaluationException {
 		AstId nom = ast.getNom();
-		//AstType type = ast.getType();
 		ArrayList<AstArg> args = ast.getArgs();
 		Ast body = ast.getBody();
-		
-		//creer une Fermeture avec args et body et remplacer le 0 par la Fermeture
-		return data.extend(nom,0);
+		//EmptyLexicalEnv or data dunoo for now
+		IFunction f = new Function(args, body,  new EmptyLexicalEnvironment()); 
+		return data.extend(nom,f);
 	}
 
 	@Override
@@ -292,7 +307,24 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 
 	@Override
 	public Object visit(AstPrim ast, ILexicalEnvironment data) throws EvaluationException {
-		return null;
+		Op operator = ast.getOp();
+		Object leftOperand = ast.getOpands().get(0).accept(this, data);
+        Object rightOperand = ast.getOpands().get(1).accept(this, data);
+       
+        switch(operator) {
+        	case ADD : 
+        		return (int)leftOperand + (int)rightOperand;
+        	case SUB : 
+        		return (int)leftOperand - (int)rightOperand;
+        	case MUL : 
+        		return (int)leftOperand * (int)rightOperand;
+        	case DIV :
+        		return (int)leftOperand / (int)rightOperand;
+		default:
+			return 0;
+        }
+        
+        //todo : lt etc ...
 	}
 
 	@Override
