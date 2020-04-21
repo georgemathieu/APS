@@ -93,107 +93,14 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
         }
 	}
 
-    /*
-    @Override
-	public Object visit(IASTunaryOperation iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        Object operand = iast.getOperand().accept(this, lexenv);
-        IASToperator operator = iast.getOperator();
-        IOperator op = getOperatorEnvironment().getUnaryOperator(operator);
-        return op.apply(operand);
-    }
-    
-    @Override
-	public Object visit(IASTbinaryOperation iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        Object leftOperand = iast.getLeftOperand().accept(this, lexenv);
-        Object rightOperand = iast.getRightOperand().accept(this, lexenv);
-        IASToperator operator = iast.getOperator();
-        IOperator op = getOperatorEnvironment().getBinaryOperator(operator);
-        return op.apply(leftOperand, rightOperand);
-    }
-
-    @Override
-	public Object visit(IASTsequence iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        IASTexpression[] expressions = iast.getExpressions();
-        Object lastValue = null;
-        for ( IASTexpression e : expressions ) {
-            lastValue = e.accept(this, lexenv);
-        }
-        return lastValue;
-    }
-    
-    @Override
-	public Object visit(IASTblock iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        ILexicalEnvironment lexenv2 = lexenv;
-        for ( IASTbinding binding : iast.getBindings() ) {
-            Object initialisation = 
-                    binding.getInitialisation().accept(this, lexenv);
-            lexenv2 = lexenv2.extend(binding.getVariable(), initialisation);
-        }
-        return iast.getBody().accept(this, lexenv2);
-    }
-
-    @Override
-	public Object visit(IASTboolean iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        return iast.getValue();
-    }
-    
-    @Override
-	public Object visit(IASTinteger iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        return iast.getValue();
-    }
-    
-    @Override
-	public Object visit(IASTfloat iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        return iast.getValue();
-    }
-    
-    @Override
-	public Object visit(IASTstring iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        return iast.getValue();
-    }
-
-    @Override
-	public Object visit(IASTvariable iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        try {
-            return lexenv.getValue(iast);
-        } catch (EvaluationException exc) {
-            return getGlobalVariableEnvironment()
-                    .getGlobalVariableValue(iast.getName());
-        }
-    }
-    
-    @Override
-	public Object visit(IASTinvocation iast, ILexicalEnvironment lexenv) 
-            throws EvaluationException {
-        Object function = iast.getFunction().accept(this, lexenv);
-        if ( function instanceof Invocable ) {
-            Invocable f = (Invocable)function;
-            List<Object> args = new Vector<Object>();
-            for ( IASTexpression arg : iast.getArguments() ) {
-                Object value = arg.accept(this, lexenv);
-                args.add(value);
-            }
-            return f.apply(this, args.toArray());
-        } else {
-            String msg = "Cannot apply " + function;
-            throw new EvaluationException(msg);
-        }
-    }
-	*/
-    
 	@Override
 	public Object visit(AstAbtract ast, ILexicalEnvironment data) throws EvaluationException {
 		ast.getArgs();
-		return null;
+		ast.getExpression();
+        IFunction fun = new Function(ast.getArgs(),
+                ast.getExpression(),
+                data);
+        return fun;
 	}
 
 	@Override
@@ -216,6 +123,7 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	@Override
 	public Object visit(AstArg ast, ILexicalEnvironment data) throws EvaluationException {
 		// TODO Auto-generated method stub
+		//not used
 		return null;
 	}
 
@@ -257,10 +165,10 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	public Object visit(AstConst ast, ILexicalEnvironment data) throws EvaluationException {
 		return data.extend(ast.getNom(),ast.getValeur().accept(this, data));
 	}
-
+	
 	@Override
 	public Object visit(AstDec iast, ILexicalEnvironment data) throws EvaluationException {
-		//jamais utiliser car ya AstConst, AstFun et AstFunRec
+		//jamais utiliser car ya AstConst, AstFun et AstFunRec (AstDec = interface)
 		return null;
 	}
 
@@ -290,9 +198,14 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	}
 
 	@Override
-	public Object visit(AstFunRec iast, ILexicalEnvironment data) throws EvaluationException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object visit(AstFunRec ast, ILexicalEnvironment data) throws EvaluationException {
+		AstId nom = ast.getNom();
+		ArrayList<AstArg> args = ast.getArgs();
+		Ast body = ast.getBody();
+		ILexicalEnvironment env = new EmptyLexicalEnvironment();
+		IFunction f = new Function(args, body,  env);
+		f.setClosedEnvironment(env.extend(nom, f));
+		return data.extend(nom,f);
 	}
 
 	@Override
@@ -308,23 +221,43 @@ implements IASTvisitor<Object, ILexicalEnvironment, EvaluationException> {
 	@Override
 	public Object visit(AstPrim ast, ILexicalEnvironment data) throws EvaluationException {
 		Op operator = ast.getOp();
-		Object leftOperand = ast.getOpands().get(0).accept(this, data);
-        Object rightOperand = ast.getOpands().get(1).accept(this, data);
-       
-        switch(operator) {
-        	case ADD : 
-        		return (int)leftOperand + (int)rightOperand;
-        	case SUB : 
-        		return (int)leftOperand - (int)rightOperand;
-        	case MUL : 
-        		return (int)leftOperand * (int)rightOperand;
-        	case DIV :
-        		return (int)leftOperand / (int)rightOperand;
-		default:
-			return 0;
-        }
         
-        //todo : lt etc ...
+        if(operator == Op.NOT){
+    		Object operand = ast.getOpands().get(0).accept(this, data);
+    		if(operand instanceof Integer){
+    			return ((Integer)operand == 1) ? 0:1;
+    		}else {
+    			throw new EvaluationException("operand not integer");
+    		}
+        }
+        else {
+    		Object rightOperand =  ast.getOpands().get(0).accept(this, data);
+            Object leftOperand =  ast.getOpands().get(1).accept(this, data);
+            if(leftOperand instanceof Integer && rightOperand instanceof Integer) {
+		        switch(operator) {
+	        	case ADD : 
+	        		return (Integer)leftOperand + (Integer)rightOperand;
+	        	case SUB : 
+	        		return (Integer)leftOperand - (Integer)rightOperand;
+	        	case MUL : 
+	        		return (Integer)leftOperand * (Integer)rightOperand;
+	        	case DIV :
+	        		return (Integer)leftOperand / (Integer)rightOperand;
+	        	case AND : 
+	        		return ((Integer)leftOperand==1 && (Integer)rightOperand == 1) ? 1:0;
+	        	case OR : 
+	        		return ((Integer)leftOperand==1 || (Integer)rightOperand == 1) ? 1:0;
+	        	case LT :
+	        		return ((Integer)leftOperand < (Integer) rightOperand) ? 1:0;
+	        	case EQ:
+	        		return ((Integer)leftOperand == (Integer)rightOperand) ? 1:0;
+	        	default:
+	        		throw new EvaluationException("operator doesn't exist");
+		        }
+            } else {
+            	throw new EvaluationException("operands are not integers");
+            }            	
+        }
 	}
 
 	@Override

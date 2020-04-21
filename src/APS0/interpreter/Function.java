@@ -22,10 +22,10 @@ public class Function implements IFunction {
         this.body = body;
         this.lexenv = lexenv;
     }
+    
     private final ArrayList<AstArg>  variables;
     private final Ast body;
-    private final ILexicalEnvironment lexenv;
-    // hint possible name ???
+    private  ILexicalEnvironment lexenv;
 
     @Override
 	public int getArity() {
@@ -41,6 +41,10 @@ public class Function implements IFunction {
     protected ILexicalEnvironment getClosedEnvironment() {
         return lexenv;
     }
+    
+    public void setClosedEnvironment(ILexicalEnvironment lexenv) {
+        this.lexenv = lexenv;
+    }
 
     @Override
 	public Object apply(Interpreter interpreter, Object[] argument)
@@ -49,7 +53,6 @@ public class Function implements IFunction {
             String msg = "Wrong arity";
             throw new EvaluationException(msg);
         }
-     
         ILexicalEnvironment lexenv2 = getClosedEnvironment();
         ArrayList<AstArg>  variables = getVariables();
         for ( int i=0 ; i<argument.length ; i++ ) {

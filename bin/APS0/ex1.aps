@@ -1,1 +1,1 @@
-[const x int 10;ECHO (x)]
+[const a int 34; FUN rec f int [x:int](if (lt x 42)(f (add x 4)) x) ;ECHO (f a)]
